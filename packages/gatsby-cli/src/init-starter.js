@@ -81,14 +81,19 @@ const maybeCreateGitIgnore = async rootPath => {
 
 // Create an initial git commit in the new directory
 const createInitialGitCommit = async (rootPath, starterUrl) => {
-  report.info(`Create initial git commit in ${rootPath}`)
+  try {
+    report.info(`Create initial git commit in ${rootPath}`)
 
-  await spawn(`git add -A`, { cwd: rootPath })
-  // use execSync instead of spawn to handle git clients using
-  // pgp signatures (with password)
-  execSync(`git commit -m "Initial commit from gatsby: (${starterUrl})"`, {
-    cwd: rootPath,
-  })
+    await spawn(`gita add -A`, { cwd: rootPath })
+    // use execSync instead of spawn to handle git clients using
+    // pgp signatures (with password)
+    execSync(`gita commit -m "Initial commit from gatsby: (${starterUrl})"`, {
+      cwd: rootPath,
+    })
+  } catch (c) {
+    await fs.remove(`./.git`)
+    report.error(`git failed. Intializing repository without git support.`)
+  }
 }
 
 // Executes `npm install` or `yarn install` in rootPath.
